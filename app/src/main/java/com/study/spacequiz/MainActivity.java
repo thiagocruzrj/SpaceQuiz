@@ -1,9 +1,12 @@
 package com.study.spacequiz;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -15,15 +18,18 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
+    private ImageView imageView;
     private TextView question;
+    private RadioGroup radioGroup;
     private RadioButton bt1;
     private RadioButton bt2;
     private RadioButton bt3;
-    private RadioGroup radioGroup;
-    private ImageView imageView;
+    private Button nextQuestion;
 
     private String rightAnswer;
     private int rightCount = 0;
+    private int quizCount = 1;
+    static final private int QUIZ_COUNT = 5;
 
     ArrayList<ArrayList<String>>quizArray = new ArrayList<>();
 
@@ -42,26 +48,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         question = findViewById(R.id.question);
-        bt1 = findViewById(R.id.bt1);
-        bt2 = findViewById(R.id.bt2);
-        bt3 = findViewById(R.id.bt3);
+        bt1 = findViewById(R.id.a1);
+        bt2 = findViewById(R.id.a2);
+        bt3 = findViewById(R.id.a3);
         radioGroup = findViewById(R.id.radioGroup);
+        nextQuestion = findViewById(R.id.nextQuestion);
 
         for(int i = 0; i < quizData.length; i++){
             ArrayList<String> tempArray = new ArrayList<>();
             tempArray.add(quizData[i][0]);
             tempArray.add(quizData[i][1]);
             tempArray.add(quizData[i][2]);
+            tempArray.add(quizData[i][3]);
 
             quizArray.add(tempArray);
         }
-        showNextQuiz();
+
     }
 
     private void showNextQuiz() {
         Random random = new Random();
         int randomNum = random.nextInt(quizArray.size());
-        ArrayList<String> quiz = quizArray.get(randomNum);
+        final ArrayList<String> quiz = quizArray.get(randomNum);
         question.setText(quiz.get(0));
         rightAnswer = quiz.get(1);
         quiz.remove(0);
@@ -90,6 +98,21 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(alertTitle);
         builder.setMessage("Answer: " + rightAnswer);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (quizCount == QUIZ_COUNT){
+                    Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
+                    intent.putExtra("RIGHT_ANSWER_COUNT", rightCount);
+                    startActivity(intent);
+                } else {
+                    quizCount++;
+                    showNextQuiz();
+                }
+            }
+        });
+
         builder.setCancelable(false);
         builder.show();
     }

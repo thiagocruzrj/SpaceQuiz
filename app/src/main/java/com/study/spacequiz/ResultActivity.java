@@ -1,6 +1,8 @@
 package com.study.spacequiz;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,12 +18,16 @@ public class ResultActivity extends AppCompatActivity {
         TextView resultAnswers = findViewById(R.id.resultAnswers);
         MediaPlayer win;
         MediaPlayer fail;
-        int score = getIntent().getIntExtra("RIGHT_ANSWER_COUNT", 0);
 
         win = MediaPlayer.create(this, R.raw.nice);
         fail = MediaPlayer.create(this, R.raw.lose);
 
-        if (score >=4 ) {
+        int score = getIntent().getIntExtra("RIGHT_ANSWER_COUNT", 0);
+
+        SharedPreferences settings = getSharedPreferences("quizApp", Context.MODE_PRIVATE);
+        resultAnswers.setText(score + " / 5");
+
+        if (score >=3 ) {
             win.start();
         } else {
             fail.start();
